@@ -67,8 +67,16 @@
   .section{padding:clamp(10px,1.8vh,16px) 18px; border-bottom:1px solid var(--line); flex:none;}
   .section:last-of-type{border-bottom:none;}
 
-  .row2{display:grid; grid-template-columns:1.4fr 1fr; gap:10px;}
-  .field{display:flex; flex-direction:column; gap:4px; width:100%;}
+  /* ---------- Amount + installments row ---------- */
+  .row2{
+    display:grid;
+    grid-template-columns:1.4fr 1fr;
+    gap:10px;
+    align-items:end; /* keep both controls sitting on the same baseline */
+  }
+  .field{display:flex; flex-direction:column; gap:5px; width:100%;}
+  .field-label{font-size:11.5px; color:var(--ink-soft); font-weight:600; padding-inline-start:2px;}
+
   .field input{
     border:1.5px solid var(--line); border-radius:9px; padding:9px 11px;
     font-size:14px; font-family:'Heebo', sans-serif; outline:none; transition:.15s;
@@ -79,7 +87,12 @@
 
   .amount-field{position:relative;}
   .amount-field input{
-    font-family:'Fira Code', monospace; font-size:19px; font-weight:500; padding:9px 36px 9px 11px;
+    font-family:'Fira Code', monospace;
+    font-size:18px;
+    font-weight:600;
+    padding:0 40px 0 12px;
+    height:44px;
+    border-radius:9px;
   }
   .amount-field input::-webkit-outer-spin-button,
   .amount-field input::-webkit-inner-spin-button{
@@ -89,16 +102,32 @@
     -moz-appearance:textfield; appearance:textfield;
   }
   .amount-field .currency{
-    position:absolute; left:12px; top:50%; transform:translateY(-50%);
-    color:var(--ink-soft); font-size:15px; font-family:'Fira Code', monospace;
+    position:absolute; left:13px; top:50%; transform:translateY(-50%);
+    color:var(--ink-soft); font-size:14px; font-family:'Fira Code', monospace;
   }
 
   select#tashlumim{
-    border:1.5px solid var(--line); border-radius:9px; padding:9px 10px;
+    border:1.5px solid var(--line); border-radius:9px; padding:0 10px;
     font-size:13.5px; font-family:'Heebo', sans-serif; color:var(--ink); background:#fff; outline:none;
-    width:100%;
+    width:100%; height:44px;
   }
   select#tashlumim:focus{border-color:var(--blue);}
+
+  /* ---------- More details toggle ---------- */
+  .more-toggle{
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    margin-top:12px; padding:8px; border:none; background:none; cursor:pointer;
+    font-size:13px; color:var(--blue); font-family:'Heebo', sans-serif; font-weight:600;
+    width:100%;
+  }
+  .more-toggle svg{transition:transform .2s ease;}
+  .more-toggle.open svg{transform:rotate(180deg);}
+
+  .extra-fields{
+    display:grid; grid-template-rows:0fr; transition:grid-template-rows .25s ease;
+  }
+  .extra-fields.open{grid-template-rows:1fr;}
+  .extra-fields-inner{overflow:hidden;}
 
   .form-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;}
   .order-line{margin-top:8px;}
@@ -147,25 +176,38 @@
     <div class="section">
       <div class="row2">
         <div class="field amount-field">
-          <input id="amount" type="number" min="5" placeholder="סכום לתשלום">
+          <span class="field-label">סכום לתשלום</span>
+          <input id="amount" type="number" min="5" placeholder="0">
           <span class="currency">₪</span>
         </div>
-        <select id="tashlumim">
-          <option value="1">תשלום אחד</option>
-          <option value="2">2 תשלומים</option>
-          <option value="3">3 תשלומים</option>
-          <option value="6">6 תשלומים</option>
-          <option value="12">12 תשלומים</option>
-        </select>
+        <div class="field">
+          <span class="field-label">תשלומים</span>
+          <select id="tashlumim">
+            <option value="1">תשלום אחד</option>
+            <option value="2">2 תשלומים</option>
+            <option value="3">3 תשלומים</option>
+            <option value="6">6 תשלומים</option>
+            <option value="12">12 תשלומים</option>
+          </select>
+        </div>
       </div>
-      <div class="field order-line">
-        <input id="orderDesc" type="text" placeholder="תיאור / מספר הזמנה (לא חובה)">
-      </div>
-      <div class="form-grid">
-        <div class="field"><input id="firstName" type="text" placeholder="שם פרטי" autocomplete="given-name"></div>
-        <div class="field"><input id="lastName" type="text" placeholder="שם משפחה" autocomplete="family-name"></div>
-        <div class="field"><input id="phone" type="tel" placeholder="טלפון" autocomplete="tel"></div>
-        <div class="field"><input id="mail" type="email" placeholder="דוא&quot;ל" autocomplete="email"></div>
+
+      <button type="button" class="more-toggle" id="moreToggle">
+        עוד פרטים
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="extra-fields" id="extraFields">
+        <div class="extra-fields-inner">
+          <div class="field order-line">
+            <input id="orderDesc" type="text" placeholder="תיאור / מספר הזמנה (לא חובה)">
+          </div>
+          <div class="form-grid">
+            <div class="field"><input id="firstName" type="text" placeholder="שם פרטי" autocomplete="given-name"></div>
+            <div class="field"><input id="lastName" type="text" placeholder="שם משפחה" autocomplete="family-name"></div>
+            <div class="field"><input id="phone" type="tel" placeholder="טלפון" autocomplete="tel"></div>
+            <div class="field"><input id="mail" type="email" placeholder="דוא&quot;ל" autocomplete="email"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -191,6 +233,15 @@ const API_VALID = '2LR6bWRiJ+';
 const frame = document.getElementById('NedarimFrame');
 const payBtn = document.getElementById('payBtn');
 const statusBox = document.getElementById('statusBox');
+const moreToggle = document.getElementById('moreToggle');
+const extraFields = document.getElementById('extraFields');
+
+moreToggle.addEventListener('click', () => {
+  const isOpen = extraFields.classList.toggle('open');
+  moreToggle.classList.toggle('open', isOpen);
+  moreToggle.firstChild.textContent = isOpen ? 'פחות פרטים ' : 'עוד פרטים ';
+});
+
 
 // רישום המאזין וטעינת ה-src פעם אחת בלבד בחיי הדף
 window.addEventListener('message', ReadPostMessage);
